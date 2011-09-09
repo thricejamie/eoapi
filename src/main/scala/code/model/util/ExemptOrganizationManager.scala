@@ -4,6 +4,7 @@ import code.model._
 import dispatch._
 import java.io._
 import java.text._
+import java.util._
 import java.util.zip._
 import net.liftweb.actor._
 import net.liftweb.http._
@@ -16,8 +17,11 @@ import scala.io._
 case class Refresh()
 
 object ExemptOrganizationManager extends LiftActor {
+  var refreshTime: Date = null
+  
   def messageHandler = {
-    case Refresh => { 
+    case Refresh => {
+      refreshTime = new Date
       Schedule.schedule(this, Refresh, 1 day)
       val df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz")
       val endpoint = :/ ("www.irs.gov") / "pub" / "irs-soi"
@@ -27,7 +31,7 @@ object ExemptOrganizationManager extends LiftActor {
       MasterListingFileUrl.findAll.foreach(urlInfo => {
         val ep = new Request(urlInfo.url)
         val lastModified = Http(ep.HEAD >:> {h => df.parse(h.get("Last-Modified").get.head)})
-        if (lastModified != urlInfo.lastModified) {
+        if (lastModified != urlInfo.lastModified.is) {
           val fileOut = new FileOutputStream(tempFile)
           Http(ep >>> fileOut)
           fileOut.close

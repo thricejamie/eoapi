@@ -14,7 +14,7 @@ class MasterListingFileUrl extends LongKeyedMapper[MasterListingFileUrl] with Id
 object MasterListingFileUrl extends MasterListingFileUrl with LongKeyedMetaMapper[MasterListingFileUrl] {
   override def dbAddTable = {
     (1 to 4).foreach(i => {
-      MasterListingFileUrl.create.url("http://www.irs.gov/pub/irs-soi/eo" + i + ".exe").save
+      MasterListingFileUrl.create.url("http://www.irs.gov/pub/irs-soi/eo" + i + ".zip").save
     })
     Empty
   }

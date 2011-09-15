@@ -17,9 +17,7 @@ object ExemptOrganizationRestHelper extends RestHelper {
   implicit def string2Long(s: String): Long = augmentString(s).toLong
   implicit def toXml(eo: ExemptOrganization): Node = Xml.toXml(eo).head
   implicit def toJSON(eo: ExemptOrganization): JValue = eo.toJSON
-  //implicit def toXml(eos: List[Node]): Node = <exemptOrganizations>{eos}</exemptOrganizations>
-  //implicit def toXml(eos: List[ExemptOrganization]): Node = <exemptOrganizations>{eos.map(toXml)}</exemptOrganizations>
-  //implicit def toJSON(eos: List[ExemptOrganization]): JValue = ("exemptOrganizations" -> eos.map(toJSON))
+  
   
   serve {
     case "api" :: "ein" :: ein :: Nil JsonGet _ =>
@@ -30,13 +28,17 @@ object ExemptOrganizationRestHelper extends RestHelper {
       for {
         org <- ExemptOrganization.find(By(ExemptOrganization.ein, ein)) ?~ "Organization not found"
       } yield org: Node
-    /*case "api" :: "name" :: name :: Nil JsonGet _ =>
+    case "api" :: "name" :: name :: Nil JsonGet _ =>
       for {
-        orgs <- ExemptOrganization.findAll(Like(ExemptOrganization.name, name))
-      } yield orgs: JValue*/
+        orgs <- ("exemptOrganizations" -> ExemptOrganization.findAll(By(ExemptOrganization.name, name.toUpperCase)))
+      } yield orgs: JValue
+    case "api" :: "like" :: name :: Nil JsonGet _ =>
+      for {
+        orgs <- ("exemptOrganizations" -> ExemptOrganization.findAll(Like(ExemptOrganization.name, "%" + name.toUpperCase + "%")))
+      } yield orgs: JValue
     /*case "api" :: "name" :: name :: Nil XmlGet _ =>
       for {
-        orgs <- ExemptOrganization.findAll(Like(ExemptOrganization.name, name))
+        orgs <- <exemptOrganizations>{ExemptOrganization.findAll(Like(ExemptOrganization.name, name))</exemptOrganizations>
       } yield orgs: Node*/
   }
 }

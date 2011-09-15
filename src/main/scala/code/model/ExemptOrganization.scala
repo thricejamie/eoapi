@@ -11,7 +11,9 @@ class ExemptOrganization extends LongKeyedMapper[ExemptOrganization] with IdPK {
   object ein extends MappedLong(this) {
     override def dbIndexed_? = true
   }
-  object name extends MappedString(this, 70) 
+  object name extends MappedString(this, 70) {
+    override def dbIndexed_? = true
+  }
   object inCareOfName extends MappedString(this, 35)
   object address extends MappedString(this, 35)
   object city extends MappedString(this, 22)
